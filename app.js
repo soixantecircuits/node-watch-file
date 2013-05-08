@@ -10,33 +10,20 @@ var express = require('express')
   , path = require('path');
 
 var app = express();
+var path = "/var/www";
 
-// Require
-var watchr = require('watchr');
+var chokidar = require('chokidar');
 
-// Watch a directory or file
-console.log('Watch our paths');
-watchr.watch({
-    paths: ['/var/www'],
-    listeners: {
-        log: function(logLevel){
-            console.log('a log message occured:', arguments);
-        },
-        error: function(err){
-            console.log('an error occured:', err);
-        },
-        watching: function(err,watcherInstance,isWatching){
-            if (err) {
-                console.log("watching the path " + watcherInstance.path + " failed with error", err);
-            } else {
-                console.log("watching the path " + watcherInstance.path + " completed");
-            }
-        },
-        change: function(changeType,filePath,fileCurrentStat,filePreviousStat){
-            console.log('a change event occured:',arguments);
-        }
-    }
-});
+var watcher = chokidar.watch(path, {ignored: /^\./, persistent: true});
+
+watcher
+  .on('add', function(path) {console.log('File', path, 'has been added');})
+  .on('change', function(path) {console.log('File', path, 'has been changed');})
+  .on('unlink', function(path) {console.log('File', path, 'has been removed');})
+  .on('error', function(error) {console.error('Error happened', error);})
+
+// Only needed if watching is persistent.
+watcher.close();
 
 
 app.configure(function(){
