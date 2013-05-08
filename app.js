@@ -17,7 +17,7 @@ var watchr = require('watchr');
 // Watch a directory or file
 console.log('Watch our paths');
 watchr.watch({
-    paths: ['./tmp'],
+    paths: ['/var/www'],
     listeners: {
         log: function(logLevel){
             console.log('a log message occured:', arguments);
