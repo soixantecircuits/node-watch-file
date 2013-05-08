@@ -10,11 +10,11 @@ var express = require('express')
   , path = require('path');
 
 var app = express();
-var path = "/var/www";
+var pathToWatch = "/var/www";
 
 var chokidar = require('chokidar');
 
-var watcher = chokidar.watch(path, {ignored: /^\./, persistent: true});
+var watcher = chokidar.watch(pathToWatch, {ignored: /^\./, persistent: true});
 
 watcher
   .on('add', function(path) {console.log('File', path, 'has been added');})
