@@ -17,7 +17,11 @@ var chokidar = require('chokidar');
 var watcher = chokidar.watch(pathToWatch, {ignored: /^\./, persistent: true});
 
 watcher
-  .on('add', function(path) {console.log('File', path, 'has been added');})
+  .on('add', function(path) {console.log('File', path, 'is being added');
+    if(/^[^\.].*$/.test(path.split("/").pop())){
+      console.log("File", path.split("/").pop(), "is ready !!");
+    }
+  })
   .on('change', function(path) {console.log('File', path, 'has been changed');})
   .on('unlink', function(path) {console.log('File', path, 'has been removed');})
   .on('error', function(error) {console.error('Error happened', error);})
