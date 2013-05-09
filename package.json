@@ -13,7 +13,6 @@
     "chokidar":"*",
     "node-localstorage":"*",
     "underscore":"*",
-    "socket.io":"*",
     "gm":"*",
     "websocket.io":"*"
   }
