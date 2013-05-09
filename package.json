@@ -10,6 +10,10 @@
     "ejs": "*",
     "stylus": "*",
     "watchr":"*",
-    "chokidar":"*"
+    "chokidar":"*",
+    "node-localstorage":"*",
+    "underscore":"*",
+    "socket.io":"*",
+    "gm":"*"
   }
 }

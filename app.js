@@ -1,36 +1,47 @@
-
 /**
  * Module dependencies.
  */
 
-var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path');
+var express = require('express'),
+  routes = require('./routes'),
+  user = require('./routes/user'),
+  image = require('./routes/image'),
+  http = require('http'),
+  path = require('path'),
+  gm = require('gm'),
+  watcher = require('./routes/watcher');
 
-var app = express();
-var pathToWatch = "/var/www";
+var pathToWatch = "/var/www",
+  hostname = "http://ks3326340.kimsufi.com/";
 
-var chokidar = require('chokidar');
+var app = express(),
+  server = require('http').createServer(app),
+  io = require('socket.io').listen(server);
 
-var watcher = chokidar.watch(pathToWatch, {ignored: /^\./, persistent: true});
+var watch = watcher.init(pathToWatch);
 
-watcher
-  .on('add', function(path) {console.log('File', path, 'is being added');
-    if(/^[^\.].*$/.test(path.split("/").pop())){
-      console.log("File", path.split("/").pop(), "is ready !!");
+watch.on('file-ready', function(file) {
+  console.log(file);
+  gm(file)
+    .size(function(err, size) {
+    if (!err) {
+      var data = {
+        "type": "image",
+        "url": hostname + file.split('/').pop(),
+        "size": {
+          "width": size.width,
+          "height": size.height
+        },
+        "caption": "",
+        "source": "pixcube"
+      };
+      console.log(data);
+      io.sockets.emit('media', data);
     }
-  })
-  .on('change', function(path) {console.log('File', path, 'has been changed');})
-  .on('unlink', function(path) {console.log('File', path, 'has been removed');})
-  .on('error', function(error) {console.error('Error happened', error);})
+  });
+});
 
-// Only needed if watching is persistent.
-watcher.close();
-
-
-app.configure(function(){
+app.configure(function() {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
@@ -45,13 +56,14 @@ app.configure(function(){
   app.use(express.static(path.join(__dirname, 'public')));
 });
 
-app.configure('development', function(){
+app.configure('development', function() {
   app.use(express.errorHandler());
 });
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+app.get('/images', image.list);
 
-http.createServer(app).listen(app.get('port'), function(){
+server.listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
 });
