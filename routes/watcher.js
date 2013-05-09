@@ -12,6 +12,7 @@ var initWatcher = function(pathToWatch) {
 
   watcher.on('add', function(path) {
     if (/^[^\.].*$/.test(path.split("/").pop())) {
+      console.log("filed added: ", path);
       var imageList = [];
       if (localStorage.getItem('imageList') !== null) {
         var imageList = JSON.parse(localStorage.getItem('imageList'));
@@ -30,9 +31,6 @@ var initWatcher = function(pathToWatch) {
   })
     .on('change', function(path) {
     console.log('File', path, 'has been changed');
-  })
-    .on('unlink', function(path) {
-    console.log('File', path, 'has been removed');
   })
     .on('error', function(error) {
     console.error('Error happened', error);

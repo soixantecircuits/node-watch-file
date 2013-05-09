@@ -33,8 +33,9 @@ socketServer.on('connection', function(socket) {
 
 
 var watch = watcher.init(pathToWatch);
+
 watch.on('file-ready', function(file) {
-  console.log(file);
+  console.log('file-ready :', file);
   gm(file)
     .size(function(err, size) {
     if (!err) {
