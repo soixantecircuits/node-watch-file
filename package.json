@@ -14,6 +14,7 @@
     "node-localstorage":"*",
     "underscore":"*",
     "socket.io":"*",
-    "gm":"*"
+    "gm":"*",
+    "websocket.io":"*"
   }
 }

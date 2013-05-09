@@ -6,20 +6,33 @@ var express = require('express'),
   routes = require('./routes'),
   user = require('./routes/user'),
   image = require('./routes/image'),
+  watcher = require('./routes/watcher'),
   http = require('http'),
   path = require('path'),
   gm = require('gm'),
-  watcher = require('./routes/watcher');
+  _ = require('underscore'),
+  ws = require('websocket.io');
+
 
 var pathToWatch = "/var/www",
-  hostname = "http://ks3326340.kimsufi.com/";
+  hostname = "http://ks3326340.kimsufi.com/",
+  managedSocket = [];
 
 var app = express(),
   server = require('http').createServer(app),
-  io = require('socket.io').listen(server);
+  socketServer = ws.attach(server);
+
+socketServer.on('connection', function(socket) {
+  managedSocket.push(socket);
+  _.each(managedSocket, function(el) {
+    el.send('hi');
+  });
+  socket.on('message', function() {});
+  socket.on('close', function() {});
+});
+
 
 var watch = watcher.init(pathToWatch);
-
 watch.on('file-ready', function(file) {
   console.log(file);
   gm(file)
@@ -36,7 +49,9 @@ watch.on('file-ready', function(file) {
         "source": "pixcube"
       };
       console.log(data);
-      io.sockets.emit('media', data);
+      _.each(managedSocket, function(el) {
+        el.send(JSON.stringify(data));
+      });
     }
   });
 });
@@ -63,6 +78,7 @@ app.configure('development', function() {
 app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/images', image.list);
+
 
 server.listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
